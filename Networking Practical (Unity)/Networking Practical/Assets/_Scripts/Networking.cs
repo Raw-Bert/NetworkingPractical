@@ -1,4 +1,6 @@
-﻿using Unity.Collections.LowLevel.Unsafe;
+﻿// Code in this document Based from the GDW Game Obelisk
+
+using Unity.Collections.LowLevel.Unsafe;
 using System.Runtime.InteropServices;
 using System;
 

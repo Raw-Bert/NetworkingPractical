@@ -1,4 +1,6 @@
-﻿using System.Runtime.InteropServices;
+﻿// Code in this document Based from the GDW Game Obelisk
+
+using System.Runtime.InteropServices;
 using UnityEngine;
 using Unity.Jobs;
 using static Networking;
@@ -12,6 +14,7 @@ public class NetworkControl : MonoBehaviour
     NetworkClientJob jobClient;
     JobHandle hnd;
     static bool up, down, left, right;
+
 
     [HideInInspector] public static bool close;
 
@@ -35,6 +38,7 @@ public class NetworkControl : MonoBehaviour
         public override string ToString() => "(" + x + ", " + y + ", " + z + ")";
     }
 
+//Prints error messages
     void PrintError(object msg) => Debug.LogError(msg);
     public struct NetworkServerJob : IJob
     {
@@ -75,17 +79,44 @@ public class NetworkControl : MonoBehaviour
 
         }
     }
+
+    //this sends to server
     public struct NetworkClientJob : IJob
     {
         //int size, dump;
         public SocketData sock;
         public IPEndpointData endp;
+        //public GameObject tank1;
+        //Vector3 vector = new Vector3(0, 0, 0);
         public void Execute()
         {
 
             for (; ; )
             {
-                string tmp = "hello?";
+                string tmp = ("Test Data!");
+                sendToPacket(ref sock, ref tmp, ref endp);
+                if (NetworkControl.close)
+                    break;
+            }
+            //  gotsomething = true;
+
+        }
+    }
+
+    //This will recieve from server
+    public struct NetworkRecieveJob : IJob
+    {
+        //
+        public SocketData sock;
+        public IPEndpointData endp;
+        //public GameObject tank1;
+        //Vector3 vector = new Vector3(0, 0, 0);
+        public void Execute()
+        {
+
+            for (; ; )
+            {
+                string tmp = ("Test Data!");
                 sendToPacket(ref sock, ref tmp, ref endp);
                 if (NetworkControl.close)
                     break;
@@ -96,13 +127,14 @@ public class NetworkControl : MonoBehaviour
     }
 
 
+//Main
     private void Awake()
     {
-    
+
         //UDP Client
         shutdownNetwork();//just incase there was some sort of error last time
         Networking.initNetwork();
-        endp = createIPEndpointData("10.150.32.203", 8888);
+        endp = createIPEndpointData("localhost", 8888);
         sock = initSocketData();
 
         if (createSocket(ref sock, SocketType.UDP) == P_GenericError)
